@@ -1,6 +1,6 @@
 {
   "name": "@worldbrain/storex-data-tools",
-  "version": "0.3.0",
+  "version": "0.1.0",
   "license": "MIT",
   "description": "Storex tools for data generation, import/export and migration",
   "main": "lib/index.js",
@@ -23,13 +23,12 @@
     "url": "https://github.com/WorldBrain/storex.git"
   },
   "dependencies": {
-    "event-emitter": "^0.3.5",
-    "events": "^3.0.0",
+    "@worldbrain/storex": "^0.3.1",
+    "@worldbrain/storex-schema-migrations": "^0.1.0",
     "faker": "^4.1.0",
     "lodash": "^4.17.11",
-    "pluralize": "^7.0.0",
-    "randombytes": "^2.0.6",
-    "source-map-support": "^0.4.18"
+    "source-map-support": "^0.4.18",
+    "user-logic": "^0.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.0.6",

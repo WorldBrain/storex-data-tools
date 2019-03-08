@@ -1,5 +1,5 @@
 import * as expect from 'expect'
-import { generateObject } from '.';
+import { generateObject, generateObjects } from '.';
 
 describe('Data generation tools', () => {
     it('should generate simple objects', () => {
@@ -45,6 +45,26 @@ describe('Data generation tools', () => {
         }, { seed: 1 })).toEqual({
             type: 'appartment', city: 'Green Egg Valley',
             description: 'Wonderful appartment for 4 guests in Green Egg Valley'
+        })
+    })
+
+    it('should generate objects with relationships between each other', () => {
+        expect(generateObjects({
+            users: {
+                id: {fake: 'random.number'},
+            },
+            projects: {
+                user: {template: ({object}) => object('users')},
+            }
+        }, {seed: 1, seeds: {projects: 3}, counts: {users: 2, projects: 2}})).toEqual({
+            users: [
+                {id: 41702},
+                {id: 99718}
+            ],
+            projects: [
+                {user: {id: 99718}},
+                {user: {id: 41702}},
+            ]
         })
     })
     

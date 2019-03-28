@@ -1,5 +1,3 @@
-const mapKeys = require('lodash/mapKeys')
-const camelCase = require('lodash/camelCase')
 const pluralize = require('pluralize')
 const traverse = require('traverse')
 import { UserLogic } from "user-logic"

@@ -23,8 +23,6 @@
     "url": "https://github.com/WorldBrain/storex.git"
   },
   "dependencies": {
-    "@worldbrain/storex": "^0.3.1",
-    "@worldbrain/storex-schema-migrations": "^0.1.0",
     "faker": "^4.1.0",
     "lodash": "^4.17.11",
     "pluralize": "^7.0.0",
@@ -37,6 +35,8 @@
     "@types/events": "^1.2.0",
     "@types/mocha": "^2.2.44",
     "@types/node": "^10.12.11",
+    "@worldbrain/storex": "^0.3.5",
+    "@worldbrain/storex-schema-migrations": "^0.1.0",
     "@worldbrain/storex-backend-dexie": "^0.2.2",
     "chai": "^4.1.2",
     "expect": "^23.5.0",
@@ -46,5 +46,9 @@
     "sinon": "^4.1.2",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.1"
+  },
+  "peerDependencies": {
+    "@worldbrain/storex": "^0.3.5",
+    "@worldbrain/storex-schema-migrations": "^0.1.0"
   }
 }

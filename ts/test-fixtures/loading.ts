@@ -5,7 +5,7 @@ import StorageManager from "@worldbrain/storex"
 
 export async function loadFixtures(
     { storageManager, fixtures, context = {} }:
-        { storageManager: StorageManager, fixtures: { [collectionName: string]: any[] }, context?}
+        { storageManager: StorageManager, fixtures: { [collectionName: string]: any[] }, context?: { [key: string]: any } }
 ) {
     const refs = {}
 
@@ -16,8 +16,8 @@ export async function loadFixtures(
                 delete object['$store']
             }
 
-            const toModify = []
-            traverse(object).forEach(function (obj) {
+            const toModify: Array<[any, any]> = []
+            traverse(object).forEach(function (this: any, obj: any) {
                 if (obj['$ref'] || obj['$lookup']) {
                     toModify.push([this.parent.node, this.key])
                 }
@@ -43,7 +43,7 @@ export async function loadFixtures(
 
             const singularCollectionName = pluralize.singular(collectionName)
             const { object: createdObject } = await storageManager.collection(singularCollectionName).createObject(object)
-            
+
             if (storeRef) {
                 const collectionDefinition = storageManager.registry.collections[singularCollectionName]
                 const pkField = collectionDefinition.pkIndex as string

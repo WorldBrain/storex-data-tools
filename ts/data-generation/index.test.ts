@@ -28,7 +28,7 @@ describe('Data generation tools', () => {
             values: {
                 type: { fake: ({ random }) => random.arrayElement(['appartment', 'room']) },
                 city: { literal: 'Green Egg Valley' },
-                description: { template: ({ context }) => `Wonderful ${context.type} in ${context.city}` },
+                description: { template: ({ values }) => `Wonderful ${values.type} in ${values.city}` },
             },
             seed: 1
         })).toEqual({
@@ -40,7 +40,7 @@ describe('Data generation tools', () => {
             values: {
                 type: { fake: ({ random }) => random.arrayElement(['appartment', 'room']) },
                 city: { literal: 'Green Egg Valley' },
-                description: { template: ({ context }) => `Wonderful ${context.type} in ${context.city}` },
+                description: { template: ({ values }) => `Wonderful ${values.type} in ${values.city}` },
             },
             seed: 3
         })).toEqual({
@@ -55,8 +55,8 @@ describe('Data generation tools', () => {
                 type: { fake: ({ random }) => random.arrayElement(['appartment', 'room']) },
                 city: { literal: 'Green Egg Valley' },
                 description: {
-                    template: ({ context, value }) =>
-                        `Wonderful ${context.type} for ${value({ fake: ({ random }) => random.arrayElement([2, 4]) })} guests in ${context.city}`
+                    template: ({ values, value }) =>
+                        `Wonderful ${values.type} for ${value({ fake: ({ random }) => random.arrayElement([2, 4]) })} guests in ${values.city}`
                 },
             }, seed: 1
         })).toEqual({
@@ -107,10 +107,18 @@ describe('Data generation tools', () => {
             },
             order: [],
         })
+        schemaTemplate.values.sharedAnnotationListEntry = {
+            ...schemaTemplate.values.sharedAnnotationListEntry,
+            sharedAnnotation: { template: ({ context }) => context.sharedAnnotation.id },
+            normalizedPageUrl: { template: ({ context }) => context.sharedAnnotation.normalizedPageUrl },
+        }
         const objects = generateObjects({
             values: schemaTemplate.values,
             seed: 5,
-            counts: { user: 1, sharedList: 2, sharedAnnotation: 4, sharedAnnotationListEntry: 6 }
+            counts: { user: 1, sharedList: 2, sharedAnnotation: 4, sharedAnnotationListEntry: 6 },
+            prepareObjects: {
+                sharedAnnotationListEntry: ({ object }) => ({ context: { sharedAnnotation: object('sharedAnnotation') } })
+            }
         })
         expect(objects).toEqual({
             user: [expect.objectContaining({})],
@@ -133,5 +141,22 @@ describe('Data generation tools', () => {
                 expect.objectContaining({}),
             ],
         })
+        const actualEntriesAndAnnotations = objects.sharedAnnotationListEntry.map(entry => ({
+            entry: ({ id: entry.id, normalizedPageUrl: entry.normalizedPageUrl }),
+            annotation: ({
+                id: entry.sharedAnnotation,
+                normalizedPageUrl: objects.sharedAnnotation.find(
+                    annotation => annotation.id === entry.sharedAnnotation
+                ).normalizedPageUrl
+            })
+        }))
+        const expectedEntriesAndAnnotations = objects.sharedAnnotationListEntry.map(entry => ({
+            entry: ({ id: entry.id, normalizedPageUrl: entry.normalizedPageUrl }),
+            annotation: ({
+                id: entry.sharedAnnotation,
+                normalizedPageUrl: entry.normalizedPageUrl
+            })
+        }))
+        expect(actualEntriesAndAnnotations).toEqual(expectedEntriesAndAnnotations)
     })
 })

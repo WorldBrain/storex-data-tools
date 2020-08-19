@@ -100,8 +100,14 @@ export function generateObjects(template: MultiObjectTemplate) {
         objects[type] = []
 
         const count = template.counts[type]
+        const prepareObjects = template.prepareObjects?.[type]
         for (let i = 0; i < count; ++i) {
-            const newObject = generateObject({ values: config, seed: 'keep' }, { objects });
+            const context = prepareObjects ? generateTemplateValue({ template: prepareObjects }, {
+                context: {},
+                values: {},
+                objects
+            }).context : {}
+            const newObject = generateObject({ values: config, seed: 'keep' }, { objects, context });
             objects[type].push(newObject)
         }
     }
@@ -109,6 +115,7 @@ export function generateObjects(template: MultiObjectTemplate) {
 }
 
 export function generateObject(template: SingleObjectTemplate, options?: {
+    context?: { [key: string]: any }
     objects?: { [type: string]: any }
 }) {
     _maybeSeed(template.seed)
@@ -120,13 +127,21 @@ export function generateObject(template: SingleObjectTemplate, options?: {
             continue
         }
 
-        object[key] = generateValue(field, { context: object, objects: options?.objects })
+        object[key] = generateValue(field, {
+            values: object,
+            objects: options?.objects,
+            context: options?.context ?? {}
+        })
     }
 
     return object
 }
 
-export function generateValue(config: ValueConfig, options: { context?: { [key: string]: any }, objects?: { [type: string]: any } } = {}) {
+export function generateValue(config: ValueConfig, options: {
+    values: { [key: string]: any },
+    context: { [key: string]: any },
+    objects?: { [type: string]: any }
+}) {
     if (typeof config === 'object' && 'literal' in config) {
         return config.literal
     }
@@ -138,21 +153,23 @@ export function generateValue(config: ValueConfig, options: { context?: { [key: 
     }
 }
 
-export function generateTemplateValue(
-    config: TemplateValueConfig,
-    options: { context?: { [key: string]: any }, objects?: { [type: string]: any } } = {}
-) {
+export function generateTemplateValue(config: TemplateValueConfig, options: {
+    values: { [key: string]: any },
+    context: { [key: string]: any },
+    objects?: { [type: string]: any }
+}): any {
     return config.template({
+        values: options.values,
         context: options.context,
         value: (config: ValueConfig) => generateValue(config, options),
-        object: options.objects && ((type: string) => {
+        object: (type: string) => {
             if (!options.objects) {
                 throw new Error(`Tried to get a random object, but we're not generate multiple objects`)
             }
             const objects = options?.objects?.[type]
             return generateFakeValue({ fake: ({ random }) => random.arrayElement(objects) })
-        }),
-    } as any)
+        },
+    })
 }
 
 export function generateFakeValue(config: FakeValueConfig) {

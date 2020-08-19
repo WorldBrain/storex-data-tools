@@ -91,16 +91,18 @@ export const getSchemaFieldValueConfig: SchemaValueConfigGenerator = (input) => 
 export function generateObjects(template: MultiObjectTemplate) {
     _maybeSeed(template.seed)
 
-    const objects: { [type: string]: any[] } = {}
-    for (const [type, config] of Object.entries(template.values)) {
+    const objects: { [collectionName: string]: any[] } = {}
+    const collectionNames = template.order ?? Object.keys(template.values)
+    for (const collectionName of collectionNames) {
+        const config = template.values[collectionName]
         if (template.seeds) {
-            _maybeSeed(template.seeds[type])
+            _maybeSeed(template.seeds[collectionName])
         }
 
-        objects[type] = []
+        objects[collectionName] = []
 
-        const count = template.counts[type]
-        const prepareObjects = template.prepareObjects?.[type]
+        const count = template.counts[collectionName]
+        const prepareObjects = template.prepareObjects?.[collectionName]
         for (let i = 0; i < count; ++i) {
             const context = prepareObjects ? generateTemplateValue({ template: prepareObjects }, {
                 context: {},
@@ -108,7 +110,7 @@ export function generateObjects(template: MultiObjectTemplate) {
                 objects
             }).context : {}
             const newObject = generateObject({ values: config, seed: 'keep' }, { objects, context });
-            objects[type].push(newObject)
+            objects[collectionName].push(newObject)
         }
     }
     return objects

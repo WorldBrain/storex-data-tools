@@ -11,6 +11,7 @@ export interface MultiObjectTemplate {
     seeds?: { [type: string]: SeedConfig }
     counts: { [type: string]: number },
     prepareObjects?: { [type: string]: ObjectPreparer }
+    order?: string[]
 }
 
 export type SeedConfig = 'keep' | 'random' | number

@@ -18,7 +18,7 @@ export async function loadFixtures(
 
             const toModify: Array<[any, any]> = []
             traverse(object).forEach(function (this: any, obj: any) {
-                if (obj['$ref'] || obj['$lookup']) {
+                if (obj && (obj['$ref'] || obj['$lookup'])) {
                     toModify.push([this.parent.node, this.key])
                 }
             })
